@@ -36,6 +36,7 @@ class StatsView @JvmOverloads constructor(
     private var radius = 0F
     private var center = PointF()
     private var oval = RectF()
+    private var percentageData = 0F
 
     init {
         context.withStyledAttributes(attributeSet, R.styleable.StatsView) {
@@ -49,9 +50,6 @@ class StatsView @JvmOverloads constructor(
             )
         }
     }
-
-
-
 
     private val paint = Paint(
         Paint.ANTI_ALIAS_FLAG
@@ -75,8 +73,11 @@ class StatsView @JvmOverloads constructor(
             return
         } else {
             var startAngle = -90F
+
             data.forEachIndexed { index, datum ->
-                val angle = datum * 360F
+                val percentageDatum = datum / data.sum()
+                percentageData += percentageDatum
+                val angle = percentageDatum * 360F
                 paint.color = colors.getOrElse(index) { generateRandomColor() }
                 canvas.drawArc(oval, startAngle, angle, false, paint)
                 startAngle += angle
@@ -84,7 +85,7 @@ class StatsView @JvmOverloads constructor(
         }
 
         canvas.drawText(
-            "%.2f%%".format(data.sum() * 100),
+            "%.2f%%".format(percentageData * 100),
             center.x,
             center.y + textPaint.textSize / 4,
             textPaint
