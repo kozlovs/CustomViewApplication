@@ -82,6 +82,8 @@ class StatsView @JvmOverloads constructor(
                 canvas.drawArc(oval, startAngle, angle, false, paint)
                 startAngle += angle
             }
+            paint.color = colors.getOrElse(0) { generateRandomColor() }
+            canvas.drawArc(oval, -90F, 1F, false, paint)
         }
 
         canvas.drawText(
