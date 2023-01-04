@@ -83,7 +83,7 @@ class StatsView @JvmOverloads constructor(
                 percentageData += percentageDatum
                 val angle = percentageDatum * 360F
                 paint.color = colors.getOrElse(index) { generateRandomColor() }
-                canvas.drawArc(oval, startAngle, angle * progress, false, paint)
+                canvas.drawArc(oval, startAngle + 360F * progress, angle * progress, false, paint)
                 startAngle += angle
             }
         }
