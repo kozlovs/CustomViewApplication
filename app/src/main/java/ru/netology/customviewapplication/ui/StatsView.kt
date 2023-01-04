@@ -38,7 +38,6 @@ class StatsView @JvmOverloads constructor(
     private var radius = 0F
     private var center = PointF()
     private var oval = RectF()
-    private var percentageData = 0F
     private var progress = 0F
     private var valueAnimator: ValueAnimator? = null
 
@@ -77,10 +76,8 @@ class StatsView @JvmOverloads constructor(
             return
         } else {
             var startAngle = -90F
-
             data.forEachIndexed { index, datum ->
                 val percentageDatum = datum / data.sum()
-                percentageData += percentageDatum
                 val angle = percentageDatum * 360F
                 paint.color = colors.getOrElse(index) { generateRandomColor() }
                 canvas.drawArc(oval, startAngle + 360F * progress, angle * progress, false, paint)
@@ -89,7 +86,7 @@ class StatsView @JvmOverloads constructor(
         }
 
         canvas.drawText(
-            "%.2f%%".format(percentageData * 100),
+            "%.2f%%".format(100 * progress),
             center.x,
             center.y + textPaint.textSize / 4,
             textPaint
@@ -121,7 +118,7 @@ class StatsView @JvmOverloads constructor(
                 progress = anim.animatedValue as Float
                 invalidate()
             }
-            duration = 500
+            duration = 5000
             interpolator = LinearInterpolator()
         }.also {
             it.start()
