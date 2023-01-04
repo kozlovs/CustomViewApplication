@@ -28,6 +28,7 @@ class StatsView @JvmOverloads constructor(
     private var textSize = AndroidUtils.dp(context, 20).toFloat()
     private var lineWidth = AndroidUtils.dp(context, 5)
     private var colors = emptyList<Int>()
+    private var colorBase: Int? = null
     var data: List<Float> = emptyList()
         set(value) {
             field = value
@@ -36,12 +37,12 @@ class StatsView @JvmOverloads constructor(
     private var radius = 0F
     private var center = PointF()
     private var oval = RectF()
-    private var percentageData = 0F
 
     init {
         context.withStyledAttributes(attributeSet, R.styleable.StatsView) {
             textSize = getDimension(R.styleable.StatsView_textSize, textSize)
             lineWidth = getDimension(R.styleable.StatsView_lineWidth, lineWidth.toFloat()).toInt()
+            colorBase = getColor(R.styleable.StatsView_colorBase, generateRandomColor())
             colors = listOf(
                 getColor(R.styleable.StatsView_color1, generateRandomColor()),
                 getColor(R.styleable.StatsView_color2, generateRandomColor()),
@@ -73,11 +74,10 @@ class StatsView @JvmOverloads constructor(
             return
         } else {
             var startAngle = -90F
-
+            paint.color = colorBase!!
+            canvas.drawCircle(center.x, center.y, radius, paint)
             data.forEachIndexed { index, datum ->
-                val percentageDatum = datum / data.sum()
-                percentageData += percentageDatum
-                val angle = percentageDatum * 360F
+                val angle = datum * 360F
                 paint.color = colors.getOrElse(index) { generateRandomColor() }
                 canvas.drawArc(oval, startAngle, angle, false, paint)
                 startAngle += angle
@@ -87,7 +87,7 @@ class StatsView @JvmOverloads constructor(
         }
 
         canvas.drawText(
-            "%.2f%%".format(percentageData * 100),
+            "%.2f%%".format(data.sum() * 100),
             center.x,
             center.y + textPaint.textSize / 4,
             textPaint
