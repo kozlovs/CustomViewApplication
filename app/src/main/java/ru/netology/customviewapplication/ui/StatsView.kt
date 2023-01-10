@@ -76,24 +76,31 @@ class StatsView @JvmOverloads constructor(
         if (data.isEmpty()) {
             return
         } else {
+            val progressAngle = progress * 360F
+            var filled = 0F
             var startAngle = -90F
+
+            canvas.drawText(
+                "%.2f%%".format(progress * 100F),
+                center.x,
+                center.y + textPaint.textSize / 4,
+                textPaint
+            )
 
             data.forEachIndexed { index, datum ->
                 val percentageDatum = datum / data.sum()
                 percentageData += percentageDatum
                 val angle = percentageDatum * 360F
                 paint.color = colors.getOrElse(index) { generateRandomColor() }
-                canvas.drawArc(oval, startAngle + 360F * progress, angle * progress, false, paint)
+
+                canvas.drawArc(oval, startAngle, progressAngle - filled, false, paint)
                 startAngle += angle
+                filled += angle
+                if (progressAngle < filled) return
             }
         }
 
-        canvas.drawText(
-            "%.2f%%".format(percentageData * 100),
-            center.x,
-            center.y + textPaint.textSize / 4,
-            textPaint
-        )
+
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -121,7 +128,7 @@ class StatsView @JvmOverloads constructor(
                 progress = anim.animatedValue as Float
                 invalidate()
             }
-            duration = 500
+            duration = 5000
             interpolator = LinearInterpolator()
         }.also {
             it.start()
